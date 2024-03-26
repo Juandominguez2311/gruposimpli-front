@@ -1,9 +1,9 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
@@ -12,35 +12,85 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 const defaultTheme = createTheme();
 
-export default function CreateVehicle(id) {
+export default function CreateAccesory() {
+  const { idaccesory } = useParams();
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    img: "",
+    model: "",
+    tipe: "",
+  });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (idaccesory) {
+        try {
+          let jwt = localStorage.getItem("token").replace(/"/g, "");
+          let dealerId = localStorage.getItem("id").replace(/"/g, "");
+
+          const response = await axios.get(
+            `http://localhost:3000/api/dealer/${dealerId}/accesory/${idaccesory}`,
+            {
+              headers: { Authorization: `Bearer ${jwt}` },
+            }
+          );
+
+          const accesoryData = response.data;
+          setFormData({
+            name: accesoryData.name,
+            price: accesoryData.price,
+            img: accesoryData.img,
+            model: accesoryData.model,
+            tipe: accesoryData.tipe,
+          });
+        } catch (error) {
+          console.error("Error fetching accesory data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [idaccesory]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const name = formData.get("name");
     const price = formData.get("price");
     const img = formData.get("img");
-    let jwt = localStorage.getItem('token');
-    jwt = jwt.replace(/"/g, '');
-    let dealerId = localStorage.getItem('id');
-    dealerId = dealerId.replace(/"/g, '');
+    const model = formData.get("model");
+    let jwt = localStorage.getItem("token").replace(/"/g, "");
+    let dealerId = localStorage.getItem("id").replace(/"/g, "");
     const tipe = formData.get("tipe");
+
     try {
+      let url = `http://localhost:3000/api/dealer/${dealerId}/accesory`;
+      if (idaccesory) {
+        url += `/${idaccesory}`;
+      }
 
       const response = await axios.post(
-        `http://localhost:3000/api/dealer/${dealerId}/vehicle`,
+        url,
         {
           name,
           price,
           img,
           dealerId,
           tipe,
+          model,
         },
         {
-          headers: { Authorization: `Bearer ${jwt}` }
-      }
+          headers: { Authorization: `Bearer ${jwt}` },
+        }
       );
+
+      navigate("/home");
     } catch (error) {
       console.error("Error:", error);
       alert("Something went wrong. Please try again.");
@@ -63,7 +113,7 @@ export default function CreateVehicle(id) {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Create Vehicle
+            {idaccesory ? "Edit Accesory" : "Create Accesory"}
           </Typography>
           <Box
             component="form"
@@ -76,20 +126,28 @@ export default function CreateVehicle(id) {
               required
               fullWidth
               id="name"
-              label="Vehicle Name"
+              label="Accesory Name"
               name="name"
               autoComplete="name"
               autoFocus
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
             <TextField
               margin="normal"
               required
               fullWidth
               id="price"
-              label="Vehicle price"
+              label="Accesory price"
               name="price"
               autoComplete="price"
               autoFocus
+              value={formData.price}
+              onChange={(e) =>
+                setFormData({ ...formData, price: e.target.value })
+              }
             />
             <TextField
               margin="normal"
@@ -100,6 +158,10 @@ export default function CreateVehicle(id) {
               name="img"
               autoComplete="img"
               autoFocus
+              value={formData.img}
+              onChange={(e) =>
+                setFormData({ ...formData, img: e.target.value })
+              }
             />
 
             <Select
@@ -107,11 +169,14 @@ export default function CreateVehicle(id) {
               required
               fullWidth
               id="model"
-              label="Vehicle model"
+              label="Accesory model"
               name="model"
               autoComplete="model"
               autoFocus
-              defaultValue=""
+              value={formData.model}
+              onChange={(e) =>
+                setFormData({ ...formData, model: e.target.value })
+              }
             >
               <MenuItem value="SUV">SUV</MenuItem>
               <MenuItem value="Auto">Auto</MenuItem>
@@ -124,11 +189,14 @@ export default function CreateVehicle(id) {
               required
               fullWidth
               id="tipe"
-              label="Vehicle tipe"
+              label="Accesory tipe"
               name="tipe"
               autoComplete="tipe"
               autoFocus
-              defaultValue=""
+              value={formData.tipe}
+              onChange={(e) =>
+                setFormData({ ...formData, tipe: e.target.value })
+              }
             >
               <MenuItem value="Híbridos">Híbridos</MenuItem>
               <MenuItem value="Deportivos">Deportivos</MenuItem>
@@ -139,7 +207,7 @@ export default function CreateVehicle(id) {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Add vehicle
+              {idaccesory ? "Edit Accesory" : "Add Accesory"}
             </Button>
           </Box>
         </Box>

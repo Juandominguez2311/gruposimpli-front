@@ -49,6 +49,17 @@ const FooterComponent = () => {
               )}
             </div>
             {isAuthenticated ? (
+            <div>
+              <Link to="/home" style={{ color: "white" }}>Home</Link>
+            </div>
+          ) : 
+          null}
+           {isAuthenticated ? (
+            <div>
+              <Link to="/homeaccesory" style={{ color: "white" }}>Accesories</Link>
+            </div>
+          ) : null}
+            {isAuthenticated ? (
               <div>
                 <Link to="/addaccesory" style={{ color: "white" }}>Add Accessory</Link>
               </div>

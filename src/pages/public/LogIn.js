@@ -29,7 +29,7 @@ export default function Login() {
       if (response.data && response.data.token) {
         miStorage.setItem('token', JSON.stringify(response.data.token));
         miStorage.setItem('id', JSON.stringify(response.data.id))
-        navigate("/addvehicle")
+        navigate("/home", { replace: true })
       } else if (response.data === 'notexist') {
         alert('User has not signed up');
       }

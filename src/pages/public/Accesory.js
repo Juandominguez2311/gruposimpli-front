@@ -8,7 +8,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import AccesoryCard from "../components/AccesoryCard/AccesoryCard";
+import AccesoryCard from "../../components/AccesoryCard/AccesoryCard";
 
 export default function Accesory() {
   const [accesory, serAccesory] = useState([]);
@@ -23,14 +23,12 @@ export default function Accesory() {
 
   const getAccesory = async () => {
     try {
-        let url = "http://localhost:3000/api/accesory";
-        if (searchValue) {
-          url = `http://localhost:3000/api/accesory/search/${searchValue}`;
-        }
-        const {
-          data,
-        } = await axios.get(url);
-        serAccesory(data)
+      let url = "http://localhost:3000/api/accesory";
+      if (searchValue) {
+        url = `http://localhost:3000/api/accesory/search/${searchValue}`;
+      }
+      const { data } = await axios.get(url);
+      serAccesory(data);
     } catch (error) {
       console.error("Error fetching accesory:", error);
     }
@@ -94,11 +92,18 @@ export default function Accesory() {
     for (let i = 0; i < products.length; i += 4) {
       productGroups.push(products.slice(i, i + 4));
     }
-  
+
     return productGroups.map((group, index) => (
-      <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div
+        key={index}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
         {group.map((prod) => (
-          <div key={prod._id} style={{ flex: '1 0 23%' }}>
+          <div key={prod._id} style={{ flex: "1 0 23%" }}>
             <Link to={`/Accesories/Detail/${prod._id}`}>
               <AccesoryCard prod={prod} />
             </Link>
@@ -109,14 +114,31 @@ export default function Accesory() {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-      {/* Columna de Filtros */}
-      <div style={{ flex: "10%", marginTop: "20px", padding: "0 20px", textAlign: "left" }}>
-        {/* Aquí puedes agregar tus filtros */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+      }}
+    >
+      {/* Filter Column */}
+      <div
+        style={{
+          flex: "10%",
+          marginTop: "20px",
+          padding: "0 20px",
+          textAlign: "left",
+        }}
+      >
+        
         <Typography variant="body1" color="textSecondary">
           Filtros
         </Typography>
-        <Typography variant="body1" color="#212121" style={{ fontWeight: 'bold' }}>
+        <Typography
+          variant="body1"
+          color="#212121"
+          style={{ fontWeight: "bold" }}
+        >
           Carroceria
         </Typography>
         {Object.entries(modelFilters).map(([model, checked]) => (
@@ -133,27 +155,31 @@ export default function Accesory() {
         ))}
       </div>
 
-      {/* Columna de Productos */}
+      {/* Vehicle Column */}
       <div style={{ flex: "80%", display: "flex", flexDirection: "column" }}>
-        <div style={{ alignSelf: "flex-end", margin: "20px", textAlign: "center" }}>
-           {/* Campo de Búsqueda */}
-           <div style={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="body1" color="textSecondary" style={{ marginRight: "10px" }}>
-                Buscar por nombre
-              </Typography>
-              <input 
-                type="text" 
-                value={searchValue} 
-                onChange={(e) => setSearchValue(e.target.value)} 
-                style={{ marginBottom: '10px' }} 
-              />
-              <button onClick={() => getAccesory()} style={{ marginBottom: '10px', marginLeft: '10px' }}>Buscar</button>
-            </div>
+        <div
+          style={{ alignSelf: "flex-end", margin: "20px", textAlign: "center" }}
+        >
+          {/* Search */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="text"
+              value={searchValue}
+              placeholder=" Buscar por nombre"
+              onChange={(e) => setSearchValue(e.target.value)}
+              style={{ marginBottom: "10px" }}
+            />
+            <button
+              onClick={() => getAccesory()}
+              style={{ marginBottom: "10px", marginLeft: "10px" }}
+            >
+              Buscar
+            </button>
+          </div>
 
-          {/* Selector de Ordenamiento */}
+          {/* Sort */}
           <div style={{ display: "flex", alignItems: "center" }}>
             <FormControl style={{ minWidth: "140px", marginRight: "20px" }}>
-              <InputLabel id="sort-label" style={{ width: "auto" }}>Ordenar por Precio</InputLabel>
               <Select
                 labelId="sort-label"
                 value={sortOrder}
@@ -164,25 +190,23 @@ export default function Accesory() {
                 <MenuItem value="desc">Mayor a Menor</MenuItem>
               </Select>
             </FormControl>
-
-           
           </div>
         </div>
 
-        {/* Renderizado de Productos por Modelo */}
-        {Object.entries(groupAccesoryByModel(filterAccesoryByModel())).sort(([modelA], [modelB]) => {
-          const order = ['SUV', 'Auto', 'Pick-Up', 'Commertial'];
-          return order.indexOf(modelA) - order.indexOf(modelB);
-        }).map(
-          ([model, products]) => (
+        {/* Accesory Renders */}
+        {Object.entries(groupAccesoryByModel(filterAccesoryByModel()))
+          .sort(([modelA], [modelB]) => {
+            const order = ["SUV", "Auto", "Pick-Up", "Commertial"];
+            return order.indexOf(modelA) - order.indexOf(modelB);
+          })
+          .map(([model, products]) => (
             <div key={model} style={{ width: "100%" }}>
               <h2>{model}</h2>
               <div style={{ display: "flex", flexWrap: "wrap" }}>
                 {renderProductCards(sortProducts(products))}
               </div>
             </div>
-          )
-        )}
+          ))}
       </div>
     </div>
   );
